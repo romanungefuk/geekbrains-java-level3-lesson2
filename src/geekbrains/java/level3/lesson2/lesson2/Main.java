@@ -6,20 +6,22 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
-        Connection conn = null;
-        Statement stmt = null;
-        PreparedStatement ps = null;
-        try {
+         Connection conn2 = null;
+         Statement stmt2 = null;
+        PreparedStatement ps2 = null;
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
+             Statement stmt = conn.createStatement();
+             PreparedStatement ps = conn.prepareStatement("INSERT INTO Students (ID, Name, Score, 'Group') VALUES (?,?,?,?)");) {
             Class.forName("org.sqlite.JDBC");
 
-            conn = DriverManager.getConnection("jdbc:sqlite:test.db");
-            stmt = conn.createStatement();
+            // conn = DriverManager.getConnection("jdbc:sqlite:test.db");
+            //stmt = conn.createStatement();
 
             stmt.execute("DELETE FROM Students");
 
             conn.setAutoCommit(false);
 
-            ps = conn.prepareStatement("INSERT INTO Students (ID, Name, Score, 'Group') VALUES (?,?,?,?)");
+            // ps = conn.prepareStatement("INSERT INTO Students (ID, Name, Score, 'Group') VALUES (?,?,?,?)");
             ps.setInt(1, 1);
             ps.setString(2, "John");
             ps.setInt(3, 10);
@@ -57,21 +59,28 @@ public class Main {
                 System.out.println(rs.getString("Name") + " | " + rs.getInt("Score"));
             }
 
+            conn2=conn;
+            stmt2=stmt;
+            ps2=ps;
+            System.out.println(stmt.isClosed());
+            System.out.println(ps.isClosed());
+            System.out.println(conn.isClosed());
+
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                stmt.close();
-                ps.close();
-                conn.close();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        }
+        }//finally {
+//            try {
+//                stmt.close();
+//                ps.close();
+//                conn.close();
+//            } catch (SQLException throwables) {
+//                throwables.printStackTrace();
+//            }
+//        }
 
-        System.out.println(stmt.isClosed());
-        System.out.println(ps.isClosed());
-        System.out.println(conn.isClosed());
+        System.out.println(stmt2.isClosed());
+        System.out.println(ps2.isClosed());
+        System.out.println(conn2.isClosed());
     }
 }
 
